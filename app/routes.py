@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import Document
-from app.schemas import DocumentCreate, DocumentResponse
-from app.embeddings import compute_embedding
+from app.schemas import DocumentCreate, DocumentResponse, DocumentSearchResult
+from app.embeddings import compute_embedding, cosine_similarity
 import json
 
 router = APIRouter()
@@ -25,3 +25,28 @@ def create_document(document: DocumentCreate, db: Session = Depends(get_db)):
     db.refresh(new_document)
 
     return new_document
+
+
+
+@router.get("/documents/search", response_model=list[DocumentSearchResult])
+def search_documents(q: str, top_k: int = 5, db: Session = Depends(get_db)):
+    query_embedding = compute_embedding(q)
+
+    all_documents = db.query(Document).all()
+
+    results = []
+    for doc in all_documents:
+        doc_embedding = json.loads(doc.embedding)
+        score = cosine_similarity(query_embedding, doc_embedding)
+        results.append(
+            {
+                "id": doc.id,
+                "title": doc.title,
+                "content": doc.content,
+                "score": score,
+            }
+        )
+
+    results.sort(key=lambda r: r["score"], reverse=True)
+
+    return results[:top_k]
