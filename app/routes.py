@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -50,3 +50,17 @@ def search_documents(q: str, top_k: int = 5, db: Session = Depends(get_db)):
     results.sort(key=lambda r: r["score"], reverse=True)
 
     return results[:top_k]
+
+
+
+@router.delete("/documents/{id}")
+def delete_document(id: int, db: Session = Depends(get_db)):
+    document = db.query(Document).filter(Document.id == id).first()
+
+    if document is None:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    db.delete(document)
+    db.commit()
+
+    return {"detail": "Document deleted successfully"}
