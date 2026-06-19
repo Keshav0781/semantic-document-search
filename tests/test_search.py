@@ -98,3 +98,5 @@ def test_create_document_missing_content_returns_422():
         json={"title": "Incomplete Document"},
     )
     assert response.status_code == 422
+    assert response.json()["detail"][0]["loc"] == ["body", "content"]
+    assert response.json()["detail"][0]["msg"] == "Field required"
