@@ -29,10 +29,13 @@ def create_document(document: DocumentCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/documents/search", response_model=list[DocumentSearchResult])
-def search_documents(q: str, top_k: int = 5, db: Session = Depends(get_db)):
+def search_documents(q: str, top_k: int = 5, filter_title: str = None, db: Session = Depends(get_db)):
     query_embedding = compute_embedding(q)
 
-    all_documents = db.query(Document).all()
+    if filter_title is not None:
+        all_documents = db.query(Document).filter(Document.title.contains(filter_title)).all()
+    else:
+        all_documents = db.query(Document).all()
 
     results = []
     for doc in all_documents:
