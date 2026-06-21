@@ -49,6 +49,7 @@ def test_create_document_returns_id_and_created_at():
     assert "id" in data
     assert "created_at" in data
     assert data["title"] == "Test Title"
+    assert data["content"] == "Test content for creation check."
 
 
 def test_search_returns_relevant_document_first():
@@ -84,7 +85,8 @@ def test_search_returns_relevant_document_first():
 
     assert len(results) == 5
     assert results[0]["title"] == "RCS Thruster Firing Procedure"
-    assert results[0]["score"] > results[1]["score"]
+    scores = [r["score"] for r in results]
+    assert scores == sorted(scores, reverse=True)
 
 
 def test_delete_nonexistent_document_returns_404():
