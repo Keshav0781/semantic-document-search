@@ -3,7 +3,6 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
 from app.main import app
 from app.database import Base, get_db
 
@@ -14,7 +13,6 @@ test_engine = create_engine(
 )
 TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
 
-
 def override_get_db():
     db = TestSessionLocal()
     try:
@@ -22,9 +20,7 @@ def override_get_db():
     finally:
         db.close()
 
-
 app.dependency_overrides[get_db] = override_get_db
-
 
 @pytest.fixture(autouse=True)
 def setup_and_teardown_database():
@@ -32,9 +28,7 @@ def setup_and_teardown_database():
     yield
     Base.metadata.drop_all(bind=test_engine)
 
-
 client = TestClient(app)
-
 
 def test_create_document_returns_id_and_created_at():
     response = client.post(
@@ -50,7 +44,6 @@ def test_create_document_returns_id_and_created_at():
     assert "created_at" in data
     assert data["title"] == "Test Title"
     assert data["content"] == "Test content for creation check."
-
 
 def test_search_returns_relevant_document_first():
     sample_documents = [
@@ -87,7 +80,6 @@ def test_search_returns_relevant_document_first():
     assert results[0]["title"] == "RCS Thruster Firing Procedure"
     scores = [r["score"] for r in results]
     assert scores == sorted(scores, reverse=True)
-
 
 def test_delete_nonexistent_document_returns_404():
     response = client.delete("/documents/999999")

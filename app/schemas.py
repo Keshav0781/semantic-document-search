@@ -12,7 +12,6 @@ class DocumentCreate(BaseModel):
             raise ValueError("Field cannot be empty")
         return value
 
-
 class DocumentResponse(BaseModel):
     id: int
     title: str
@@ -20,7 +19,6 @@ class DocumentResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
-
 
 class DocumentSearchResult(BaseModel):
     id: int

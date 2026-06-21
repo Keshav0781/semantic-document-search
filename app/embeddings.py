@@ -8,7 +8,6 @@ def compute_embedding(text: str) -> list[float]:
     embedding = model.encode(text)
     return embedding.tolist()
 
-
 def cosine_similarity(vec_a: list[float], vec_b: list[float]) -> float:
     a = np.array(vec_a)
     b = np.array(vec_b)
