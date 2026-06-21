@@ -1,9 +1,16 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 
 class DocumentCreate(BaseModel):
     title: str
     content: str
+
+    @field_validator("title", "content")
+    @classmethod
+    def must_not_be_blank(cls, value):
+        if not value.strip():
+            raise ValueError("Field cannot be empty")
+        return value
 
 
 class DocumentResponse(BaseModel):
