@@ -5,6 +5,7 @@ from app.models import Document
 from app.schemas import DocumentCreate, DocumentResponse, DocumentSearchResult
 from app.embeddings import compute_embedding, cosine_similarity
 import json
+from fastapi import Query
 
 router = APIRouter()
 
@@ -24,7 +25,7 @@ def create_document(document: DocumentCreate, db: Session = Depends(get_db)):
     return new_document
 
 @router.get("/documents/search", response_model=list[DocumentSearchResult])
-def search_documents(q: str, top_k: int = 5, filter_title: str = None, db: Session = Depends(get_db)):
+def search_documents(q: str = Query(..., min_length=1), top_k: int = 5, filter_title: str = None, db: Session = Depends(get_db)):
     query_embedding = compute_embedding(q)
 
     if filter_title is not None:
